@@ -1,95 +1,103 @@
-# Copy Trading Bot with gRPC
-Real-time copy trading bot for Solana powered by **gRPC** and **Jupiter Aggregator**.  
-Track multiple wallets via Yellowstone's gRPC interface and automatically mirror their trades with your own wallet.
+# ⚡ Solana Copy‑Trading Bot (gRPC + Jupiter)
 
-Built for **meme coin snipers**, **volume farmers**, and **speed‑hungry traders**.
+Real‑time copy‑trading bot for Solana that listens to Yellowstone/Geyser **gRPC streams** and mirrors the master wallet’s trades through **Jupiter** swaps.
 
----
-
-## ⚙️ Features
-
-- 🔁 Copy trades in real-time using Solana gRPC stream
-- 👀 Track multiple wallets simultaneously
-- ⚡ Execute your own swaps via Jupiter Aggregator
-- 🔒 Built with connection resilience and exponential backoff
-- 🧰 Written in TypeScript with modular structure (easy to extend)
+Built for **memecoin snipers**, **volume farmers**, and traders who need ultra‑low latency.
 
 ---
 
-## 🧪 Requirements
+## ✨ Features
 
-- Node.js >= 18
-- pnpm / npm / yarn
-- Solana wallet keypair (used for signing swap txs)
-- gRPC endpoint from [GS Node](https://gsnode.io/) 
-- Jupiter aggregator enabled tokens
+| Module | Description |
+|--------|-------------|
+| 🔌 **gRPC Stream** | Subscribe to accounts via `@triton-one/yellowstone-grpc` (≈ 200‑500 ms median latency on GS Node). |
+| 🧠 **Classifier** | Detects *buys* / *sells* and separates stablecoins from tokens. |
+| 🚀 **JupiterSwap** | Creates and sends `VersionedTransaction` with dynamic priority fees. |
+| 🔄 **Multi‑wallet** | Follows multiple addresses at the same time. |
+| 🛡 **Resilience** | Auto‑reconnect with exponential back‑off. |
+| 🪶 **TypeScript** | Modular structure, easy to extend or port to another DEX. |
 
 ---
 
-## 📂 Project Structure
+## 🧪 Requirements
+
+* **Node ≥ 18**
+* pnpm / npm / yarn
+* A Solana keypair (JSON or base58)
+* gRPC endpoint from **[GS Node](https://gsnode.io)**
+* Tokens supported by Jupiter
+
+---
+
+## 📂 Project Structure
 
 .
-├── grpc/                 <!-- gRPC client to stream wallet txs-->
-│   └── WalletTracker.ts
-├── lib/                  <!--  Jupiter Swap logic-->
+├── lib/
+│   ├── constants.ts          <!-- HTTP & gRPC endpoints -->
+│   ├── grpcSubscribe.ts      <!-- Yellowstone subscription -->
+│   ├── blockhashProvider.ts
+│   └── pollTransaction.ts
+├── sniper/
+│   ├── classifier.ts         <!-- Detect buys / sells -->
+│   └── index.ts              <!-- Main bot logic -->
+├── swap/
 │   └── JupiterSwap.ts
-├── utils/
-│   └── poller.ts         <!-- Poll tx confirmation-->
-├── bot/
-│   └── main.ts           <!-- Main bot logic-->
-├── constants.ts
 ├── .env.example
 └── README.md
 
-## 🚀 Getting Started
+---
+
+## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/tuusuario/solana-grpc-copy-trading-bot.git
+git clone https://github.com/<your‑user>/solana-grpc-copy-trading-bot.git
 cd solana-grpc-copy-trading-bot
-pnpm install  
+pnpm install          # or npm / yarn
 ```
+### 1 · Set environment variables
 
-## 1. Set environment variables
+Copy .env.example → .env and fill in:
 
-Create a .env file or export manually:
+SOL_HTTP_ENDPOINT=https://rpc.gsnode.io/
+SOL_GRPC_ENDPOINT=https://grpc.gsnode.io/
+SOL_GRPC_TOKEN=        # only if your plan requires auth
 
-```bash
-SOL_HTTP_ENDPOINT=https://your-http-endpoint
-SOL_GRPC_ENDPOINT=https://your-grpc-endpoint
-SOL_GRPC_TOKEN=your-grpc-token
-```
+### 2 · Add the wallets to follow
 
-## 2. Configure tracked wallets
-
-```ts
-const walletsToMirror = [
-  "WalletAddress1",
-  "WalletAddress2",
-  // Add more wallets here
+// sniper/index.ts
+const masterWallets = [
+  "9YwtWKdNczTzJHMbVdh1J3ZFWAVmYPpCPR7FwoMvZkVx",
+  // more addresses…
 ];
-```
 
-## 3. Run the bot
+### 3 · Run the bot
 
-```bash
-pnpm start
-```
+```pnpm start``          <!--  compiles & runs with ts-node -->
 
+#### Example log:
 
-## 📈 Example Use Cases
+⏱  Subscribing with gRPC stream…
+🔍 Quote request for token: Hq6y…WZci
+🚀 Executing swap…  Txid: 5RuG…Jm2v
+✅ Position opened for Hq6y…WZci (0.000001 SOL)
 
-- Mirror whales buying meme coins in real time
-- Monitor liquidity pools and replicate big entries
+![JOIN THE DISCORD CHANNEL AND SELECT YOUR GRPC](https://github.com/user-attachments/assets/92e610eb-551a-4582-9734-e4000f29bb44)
+[Discord Channel](https://discord.gg/S3Bct3AJT5)
+
+⸻
+
+## 📈 Use Cases
+
+- Instantly copy whales buying fresh memecoins
+- Mirror large entries into new liquidity pools
 - Follow wallets farming airdrops
-- Automate sniper entries after target wallet buys
-- Copy trade good traders
+- Automate sniper entries right after the master wallet buys
 
-  
-![JOIN THE DISCORD CHANNEL AND SELECT YOUR GRPC](https://github.com/user-attachments/assets/b3042c25-366d-46e4-8e89-987031bee66a)
-[Reach out us on Dicord](https://discord.gg/S3Bct3AJT5)
 
-## 💬 Support
+⸻
 
-Need a gRPC node for production use?
-Check out [GS Node](https://discord.gg/S3Bct3AJT5) – Solana RPC built for speed.
- 
+## 💬 Support
+
+Need a production‑grade gRPC node?
+Join our Discord and try GS Node: https://discord.gg/S3Bct3AJT5
+
